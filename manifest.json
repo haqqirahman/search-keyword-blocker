@@ -1,0 +1,77 @@
+{
+  "manifest_version": 3,
+  "name": "Chromium Search Keyword Blocker",
+  "version": "1.1.0",
+  "description": "Blokir hasil pencarian kata kunci tertentu secara otomatis di Google, Brave, Bing, DuckDuckGo, dan Yahoo.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "*://*.google.com/*",
+    "*://*.google.co.id/*",
+    "*://*.bing.com/*",
+    "*://search.brave.com/*",
+    "*://*.duckduckgo.com/*",
+    "*://search.yahoo.com/*"
+  ],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.google.com/*",
+        "*://*.google.co.id/*",
+        "*://*.bing.com/*",
+        "*://search.brave.com/*",
+        "*://*.duckduckgo.com/*",
+        "*://search.yahoo.com/*"
+      ],
+      "css": [
+        "content/anti-flash.css"
+      ],
+      "js": [
+        "core/normalizer.js",
+        "core/search-engine-parser.js",
+        "core/keyword-matcher.js",
+        "content/search-filter.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Search Keyword Blocker",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "32": "assets/icons/icon32.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "32": "assets/icons/icon32.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "pages/blocked.html",
+        "pages/blocked.css",
+        "pages/blocked.js",
+        "storage/storage.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

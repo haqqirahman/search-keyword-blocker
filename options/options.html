@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Search Keyword Blocker</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar / Brand Header -->
+    <header class="top-nav">
+      <div class="nav-container">
+        <div class="nav-brand">
+          <div class="logo-shield">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <div class="brand-titles">
+            <h1 class="app-title">Search Keyword Blocker</h1>
+            <span class="app-version">Chromium Admin Console v1.1</span>
+          </div>
+        </div>
+
+        <!-- Session Status Control -->
+        <div class="session-panel" id="session-panel">
+          <div class="session-info">
+            <span class="session-dot" id="session-dot"></span>
+            <span class="session-label" id="session-label">Admin Terkunci</span>
+            <span class="session-clock hidden" id="session-clock">05:00</span>
+          </div>
+          <button type="button" class="btn-session" id="btn-session-toggle">Buka Kunci</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+      <!-- Setup Admin Password Banner (if not set) -->
+      <section id="setup-banner" class="banner-card hidden">
+        <div class="banner-icon">⚠️</div>
+        <div class="banner-body">
+          <h2 class="banner-title">Password Administrator Belum Dikonfigurasi</h2>
+          <p class="banner-desc">Buat password administrator untuk mengunci pengaturan kata kunci dan mencegah modifikasi tanpa izin.</p>
+        </div>
+        <button id="btn-setup-password-trigger" class="btn-banner">Buat Password Admin</button>
+      </section>
+
+      <div class="dashboard-grid">
+        <!-- Left Column: Keyword Management -->
+        <div class="dashboard-main">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h2 class="panel-title">Daftar Kata Kunci Diblokir</h2>
+                <span class="badge-count" id="badge-total-keywords">0 kata kunci</span>
+              </div>
+              <div class="panel-header-actions">
+                <button type="button" class="btn-action-alt" id="btn-open-bulk-import">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                  <span>Bulk Import</span>
+                </button>
+                <button type="button" class="btn-action-alt" id="btn-export-config">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                  <span>Ekspor</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Add Keyword Bar -->
+            <form id="form-add-keyword" class="add-keyword-bar">
+              <div class="input-with-icon">
+                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" id="input-new-keyword" class="input-text" placeholder="Masukkan kata kunci baru (contoh: vpn, proxy)..." required autocomplete="off">
+              </div>
+              <select id="select-keyword-level" class="input-select" title="Tingkat Proteksi">
+                <option value="normal">Level 1: Normal</option>
+                <option value="protected" selected>Level 2: Protected 🔒</option>
+                <option value="mandatory">Level 3: Mandatory 🛡️</option>
+              </select>
+              <button type="submit" class="btn-add">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                <span>Tambah</span>
+              </button>
+            </form>
+
+            <!-- Search / Filter Keyword -->
+            <div class="filter-bar">
+              <input type="text" id="input-search-filter" class="input-filter" placeholder="Cari dalam daftar blacklist...">
+              <div class="level-legend">
+                <span class="legend-item"><span class="badge-tag-level level-normal">Normal</span> Dapat dikelola</span>
+                <span class="legend-item"><span class="badge-tag-level level-protected">🔒 Protected</span> Butuh konfirmasi</span>
+                <span class="legend-item"><span class="badge-tag-level level-mandatory">🛡️ Mandatory</span> Wajib/Kunci</span>
+              </div>
+            </div>
+
+            <!-- Keyword List Table -->
+            <div class="table-container">
+              <table class="keyword-table">
+                <thead>
+                  <tr>
+                    <th>Kata Kunci</th>
+                    <th>Tingkat Proteksi</th>
+                    <th>Ditambahkan</th>
+                    <th class="col-actions">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="keyword-table-body">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+              <div id="empty-state" class="empty-state hidden">
+                <div class="empty-icon">🔍</div>
+                <p>Tidak ada kata kunci yang cocok.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: System & Security Settings -->
+        <div class="dashboard-sidebar">
+          <!-- General Policies -->
+          <div class="panel-card">
+            <h3 class="sidebar-title">Kebijakan Proteksi</h3>
+            
+            <div class="setting-row">
+              <div class="setting-meta">
+                <span class="setting-name">Status Proteksi</span>
+                <span class="setting-desc">Aktifkan atau nonaktifkan pemblokiran search query</span>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="setting-enabled" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-meta">
+                <span class="setting-name">Mode Pemblokiran</span>
+                <span class="setting-desc">Tampilan saat search query diblokir</span>
+              </div>
+              <select id="setting-blocking-mode" class="sidebar-select">
+                <option value="blank">Mode A: Blank Page (Default)</option>
+                <option value="blocked">Mode B: Blocked Notice Card</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-meta">
+                <span class="setting-name">Metode Pencocokan</span>
+                <span class="setting-desc">Aturan pencocokan kata kunci</span>
+              </div>
+              <select id="setting-match-mode" class="sidebar-select">
+                <option value="contains">Contains (Disarankan)</option>
+                <option value="exact">Exact (Sama Persis)</option>
+                <option value="word_boundary">Word Boundary (Kata Mandiri)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Search Engines -->
+          <div class="panel-card">
+            <h3 class="sidebar-title">Search Engine Terproteksi</h3>
+            <p class="sidebar-desc">Pilih mesin pencari yang akan dipantau oleh extension:</p>
+            <div class="engine-checklist">
+              <label class="check-item">
+                <input type="checkbox" id="engine-google" checked>
+                <span class="check-label">Google (google.com / google.co.id)</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" id="engine-brave" checked>
+                <span class="check-label">Brave Search (search.brave.com)</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" id="engine-bing" checked>
+                <span class="check-label">Microsoft Bing (bing.com)</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" id="engine-duckduckgo" checked>
+                <span class="check-label">DuckDuckGo (duckduckgo.com)</span>
+              </label>
+              <label class="check-item">
+                <input type="checkbox" id="engine-yahoo" checked>
+                <span class="check-label">Yahoo Search (search.yahoo.com)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Admin Security Management -->
+          <div class="panel-card">
+            <h3 class="sidebar-title">Keamanan Administrator</h3>
+            <div class="setting-row">
+              <div class="setting-meta">
+                <span class="setting-name">Durasi Sesi Admin</span>
+                <span class="setting-desc">Otomatis terkunci setelah tidak aktif</span>
+              </div>
+              <select id="setting-session-minutes" class="sidebar-select">
+                <option value="3">3 Menit</option>
+                <option value="5" selected>5 Menit (Default)</option>
+                <option value="10">10 Menit</option>
+                <option value="15">15 Menit</option>
+              </select>
+            </div>
+
+            <div class="sidebar-actions">
+              <button type="button" class="btn-secondary-full" id="btn-change-password">Ganti Password Admin</button>
+              <button type="button" class="btn-danger-outline" id="btn-reset-extension">Reset Extension ke Default</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Setup Admin Password Modal -->
+    <div id="modal-setup-password" class="modal-overlay hidden">
+      <div class="modal-dialog">
+        <div class="modal-head">
+          <h3 class="modal-headline">Setup Administrator Password</h3>
+          <p class="modal-sub">Password ini digunakan untuk melindungi konfigurasi dan mencegah penghapusan kata kunci.</p>
+        </div>
+        <form id="form-setup-password">
+          <div class="form-group">
+            <label class="form-label">Password Baru (min. 8 karakter)</label>
+            <input type="password" id="input-setup-password" class="form-input" minlength="8" required placeholder="Minimal 8 karakter (disarankan 12+)...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Konfirmasi Password</label>
+            <input type="password" id="input-setup-confirm" class="form-input" minlength="8" required placeholder="Ulangi password...">
+          </div>
+          <div id="setup-error" class="form-error hidden"></div>
+          <div class="modal-foot">
+            <button type="button" class="btn-cancel" id="btn-cancel-setup">Batal</button>
+            <button type="submit" class="btn-submit">Simpan Password</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Admin Authentication Modal -->
+    <div id="modal-auth" class="modal-overlay hidden">
+      <div class="modal-dialog">
+        <div class="modal-head">
+          <div class="modal-lock-icon">🔒</div>
+          <h3 class="modal-headline">Verifikasi Administrator</h3>
+          <p class="modal-sub" id="auth-reason">Masukkan password admin untuk melanjutkan.</p>
+        </div>
+        <form id="form-verify-auth">
+          <div class="form-group">
+            <input type="password" id="input-auth-password" class="form-input" required placeholder="Password Administrator" autocomplete="current-password">
+          </div>
+          <div id="modal-auth-error" class="form-error hidden"></div>
+          <div class="modal-foot">
+            <button type="button" class="btn-cancel" id="btn-cancel-auth-modal">Batal</button>
+            <button type="submit" class="btn-submit" id="btn-submit-auth-modal">Verifikasi</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Keyword Confirmation Modal -->
+    <div id="modal-delete-confirm" class="modal-overlay hidden">
+      <div class="modal-dialog">
+        <div class="modal-head">
+          <div class="modal-trash-icon">🗑️</div>
+          <h3 class="modal-headline">Konfirmasi Hapus Kata Kunci</h3>
+          <p class="modal-sub">Apakah Anda yakin ingin menghapus kata kunci berikut dari blacklist?</p>
+        </div>
+        <div class="keyword-highlight-box">
+          <span class="highlight-tag" id="delete-target-keyword">vpn</span>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn-cancel" id="btn-cancel-delete">Batal</button>
+          <button type="button" class="btn-danger-solid" id="btn-confirm-delete">Hapus Kata Kunci</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Keyword Modal -->
+    <div id="modal-edit-keyword" class="modal-overlay hidden">
+      <div class="modal-dialog">
+        <div class="modal-head">
+          <h3 class="modal-headline">Edit Kata Kunci</h3>
+          <p class="modal-sub">Perbarui teks kata kunci dan tingkat proteksi.</p>
+        </div>
+        <form id="form-edit-keyword">
+          <div class="form-group">
+            <label class="form-label">Kata Kunci</label>
+            <input type="text" id="input-edit-keyword-text" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tingkat Proteksi</label>
+            <select id="select-edit-keyword-level" class="form-input">
+              <option value="normal">Level 1: Normal</option>
+              <option value="protected">Level 2: Protected 🔒</option>
+              <option value="mandatory">Level 3: Mandatory 🛡️</option>
+            </select>
+          </div>
+          <div class="modal-foot">
+            <button type="button" class="btn-cancel" id="btn-cancel-edit">Batal</button>
+            <button type="submit" class="btn-submit">Simpan Perubahan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Bulk Import Modal -->
+    <div id="modal-bulk-import" class="modal-overlay hidden">
+      <div class="modal-dialog modal-wide">
+        <div class="modal-head">
+          <h3 class="modal-headline">Bulk Import Kata Kunci</h3>
+          <p class="modal-sub">Masukkan kata kunci baru, satu kata per baris. Karakter duplikat akan otomatis diabaikan.</p>
+        </div>
+        <form id="form-bulk-import">
+          <div class="form-group">
+            <textarea id="textarea-bulk-keywords" class="form-textarea" rows="8" placeholder="vpn&#10;proxy&#10;tor&#10;free vpn&#10;download vpn" required></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tingkat Proteksi untuk Kata Kunci Baru</label>
+            <select id="select-bulk-level" class="form-input">
+              <option value="normal">Level 1: Normal</option>
+              <option value="protected" selected>Level 2: Protected 🔒</option>
+              <option value="mandatory">Level 3: Mandatory 🛡️</option>
+            </select>
+          </div>
+          <div class="modal-foot">
+            <button type="button" class="btn-cancel" id="btn-cancel-bulk">Batal</button>
+            <button type="submit" class="btn-submit">Import Kata Kunci</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Reset Extension Modal -->
+    <div id="modal-reset-confirm" class="modal-overlay hidden">
+      <div class="modal-dialog">
+        <div class="modal-head">
+          <div class="modal-alert-icon">⚠️</div>
+          <h3 class="modal-headline">Reset Extension ke Setelan Default</h3>
+          <p class="modal-sub">Tindakan ini akan mengembalikan seluruh pengaturan ke setelan pabrik. Ketik <strong>RESET</strong> untuk mengonfirmasi.</p>
+        </div>
+        <form id="form-reset-confirm">
+          <div class="form-group">
+            <input type="text" id="input-reset-confirmation-text" class="form-input" placeholder="Ketik RESET" required autocomplete="off">
+          </div>
+          <div id="reset-error" class="form-error hidden"></div>
+          <div class="modal-foot">
+            <button type="button" class="btn-cancel" id="btn-cancel-reset">Batal</button>
+            <button type="submit" class="btn-danger-solid" id="btn-confirm-reset-submit">Reset Semua Data</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="file-import-input" accept=".json" class="hidden">
+  </div>
+
+  <script src="../core/normalizer.js"></script>
+  <script src="../core/auth.js"></script>
+  <script src="../storage/storage.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Keyword Blocker</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-box">
+          <svg class="shield-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">Keyword Blocker</h1>
+          <span class="brand-subtitle">Chromium Protection</span>
+        </div>
+      </div>
+      <span id="session-badge" class="session-badge hidden" title="Sesi Admin Aktif">
+        <span class="key-icon">🔑</span> <span id="session-timer">5:00</span>
+      </span>
+    </header>
+
+    <!-- Protection Switch Card -->
+    <div class="card status-card">
+      <div class="status-info">
+        <span class="label">Status Proteksi</span>
+        <div class="status-indicator">
+          <span id="status-dot" class="dot active"></span>
+          <span id="status-text" class="status-text">Aktif</span>
+        </div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="toggle-protection" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-label">Blacklist Aktif</span>
+        <span id="stat-keyword-count" class="stat-value">0</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Diblokir Hari Ini</span>
+        <span id="stat-blocked-today" class="stat-value">0</span>
+      </div>
+    </div>
+
+    <!-- Footer Action -->
+    <footer class="footer">
+      <button id="btn-open-options" class="btn-primary">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <span>Pengaturan Administrator</span>
+      </button>
+    </footer>
+
+    <!-- In-Popup Password Verification Modal -->
+    <div id="auth-modal" class="modal-overlay hidden">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <h2 class="modal-title">Password Diperlukan</h2>
+          <p class="modal-subtitle">Masukkan password admin untuk menonaktifkan proteksi.</p>
+        </div>
+        <form id="auth-form" class="modal-form">
+          <div class="input-group">
+            <input type="password" id="auth-password" class="text-input" placeholder="Password Administrator" autocomplete="current-password" autofocus required>
+          </div>
+          <div id="auth-error" class="error-msg hidden"></div>
+          <div class="modal-actions">
+            <button type="button" id="btn-cancel-auth" class="btn-secondary">Batal</button>
+            <button type="submit" id="btn-submit-auth" class="btn-danger">Nonaktifkan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="../core/normalizer.js"></script>
+  <script src="../core/auth.js"></script>
+  <script src="../storage/storage.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

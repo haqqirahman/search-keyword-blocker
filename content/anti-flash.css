@@ -1,0 +1,10 @@
+/**
+ * Chromium Search Keyword Blocker
+ * content/anti-flash.css
+ * 
+ * Instant concealment stylesheet to prevent search results flash.
+ */
+html.skb-evaluating {
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
