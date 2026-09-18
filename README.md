@@ -1,141 +1,170 @@
-# Chromium Search Keyword Blocker Extension
+# Chromium Search Keyword Blocker 🛡️
 
-**Versi:** 1.1.0  
-**Standar:** Manifest V3 (MV3)  
-**Platform:** Google Chrome, Brave Browser, Microsoft Edge, dan browser berbasis Chromium lainnya.
+[![Manifest V3](https://img.shields.io/badge/Manifest-V3-brightgreen.svg?style=flat-square)](https://developer.chrome.com/docs/extensions/mv3/intro/)
+[![Version](https://img.shields.io/badge/Version-1.1.0-blue.svg?style=flat-square)](package.json)
+[![Tests](https://img.shields.io/badge/Tests-Passing-success.svg?style=flat-square)](tests/)
+[![License](https://img.shields.io/badge/License-MIT-orange.svg?style=flat-square)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Chromium%20%7C%20Chrome%20%7C%20Brave%20%7C%20Edge-informational.svg?style=flat-square)](https://www.chromium.org/)
 
-Extension ini berfungsi untuk mendeteksi dan memblokir hasil pencarian kata kunci tertentu (seperti `vpn`, `proxy`, dll.) di berbagai mesin pencari utama sebelum halaman sempat ditampilkan ke pengguna (dengan teknologi Anti-Flash zero-latency). Dilengkapi sistem keamanan **Admin Password** berbasis **Web Crypto API (PBKDF2-SHA256)**, session auto-lockout, dan perlindungan penghapusan keyword berjenjang.
+Ekstensi browser berbasis **Manifest V3** untuk mendeteksi dan memblokir pencarian kata kunci tertentu (misal: `vpn`, `proxy`, kata kunci berbahaya, atau distraksi lainnya) secara otomatis di berbagai mesin pencari utama. 
 
----
-
-## Fitur Utama
-
-- **Mesin Pencari yang Didukung:**
-  - Google (`google.com`, `google.co.id`, dan subkategori Google Images/Videos/News)
-  - Brave Search (`search.brave.com`)
-  - Microsoft Bing (`bing.com`)
-  - DuckDuckGo (`duckduckgo.com`)
-  - Yahoo Search (`search.yahoo.com` dengan parameter `p`)
-- **Anti-Flash Pre-Render Protection:** Menyembunyikan tampilan seketika pada `document_start` sebelum search engine merender hasil, mencegah hasil terlihat sesaat (no visual leak).
-- **Strategi Pemblokiran Fleksibel:**
-  - **Mode A (Default):** Halaman kosong murni (*blank page*).
-  - **Mode B:** Kartu peringatan modern elegan (*blocked notice card*).
-- **Tiga Metode Pencocokan Keyword:**
-  - `contains` (Default: memblokir setiap query yang memuat kata kunci)
-  - `exact` (Hanya memblokir query yang sama persis)
-  - `word_boundary` (Memblokir kata kunci sebagai kata mandiri)
-- **Tingkat Proteksi Keyword Berjenjang:**
-  - **Level 1 (Normal):** Dapat dikelola administrator.
-  - **Level 2 (Protected 🔒):** Mengharuskan password admin dan konfirmasi penghapusan.
-  - **Level 3 (Mandatory 🛡️):** Keyword wajib yang terkunci dan tidak dapat dihapus melalui antarmuka biasa.
-- **Sistem Keamanan Administrator Tingkat Lanjut:**
-  - **Non-Plaintext Storage:** Enkripsi password menggunakan PBKDF2-SHA256 dengan 310.000 iterasi dan random salt 16-byte kriptografis.
-  - **Sesi Admin Sementara:** Disimpan di `chrome.storage.session` (otomatis terkunci setelah 5 menit atau ketika browser ditutup).
-  - **Anti Brute-Force Lockout:** Progressive backoff (5 percobaan salah mengunci akses selama 30s, 60s, 120s, 300s).
-  - **Sanitized Export/Import:** Ekspor konfigurasi JSON aman tanpa menyertakan hash password atau data sesi.
-  - **Reset Guard:** Mengembalikan ke setelan pabrik mewajibkan password admin dan pengetikan kata konfirmasi `RESET`.
+Dilengkapi dengan teknologi **Anti-Flash Pre-Render Protection (Zero-Latency)** agar hasil pencarian tidak sempat berkedip di layar, serta sistem proteksi kata kunci berbasis **Web Crypto API (PBKDF2-SHA256)** dan auto-lockout anti brute-force.
 
 ---
 
-## Struktur Direktori
+## 🌟 Fitur Utama
+
+- 🔍 **Dukungan Multi Search Engine:**
+  - **Google** (`google.com`, `google.co.id`, Google Images, Videos, News)
+  - **Brave Search** (`search.brave.com`)
+  - **Microsoft Bing** (`bing.com`)
+  - **DuckDuckGo** (`duckduckgo.com`)
+  - **Yahoo Search** (`search.yahoo.com`)
+- ⚡ **Anti-Flash Pre-Render Protection:** Menyembunyikan tampilan pencarian seketika pada event `document_start` sebelum halaman sempat dirender oleh browser (mencegah *visual leak*).
+- 🚫 **2 Mode Tampilan Pemblokiran:**
+  - **Mode A (Blank Page):** Tampilan putih/kosong murni untuk efisiensi dan kerahasiaan penuh.
+  - **Mode B (Blocked Card):** Kartu pemberitahuan elegan berdesain modern dengan informasi pencarian yang diblokir.
+- 🎯 **3 Metode Pencocokan Kata Kunci:**
+  - `contains`: Memblokir setiap query pencarian yang mengandung kata kunci (default).
+  - `exact`: Hanya memblokir query yang sama persis dengan kata kunci.
+  - `word_boundary`: Memblokir kata kunci sebagai kata mandiri (*whole word*).
+- 🔒 **Tingkat Proteksi Keyword Berjenjang:**
+  - **Level 1 (Normal):** Dapat ditambahkan dan dihapus secara bebas oleh administrator.
+  - **Level 2 (Protected):** Mengharuskan otentikasi password admin untuk melakukan perubahan atau penghapusan.
+  - **Level 3 (Mandatory):** Kata kunci wajib yang terkunci secara permanen dan tidak dapat dihapus melalui antarmuka reguler.
+- 🛡️ **Keamanan Administrator Tingkat Lanjut:**
+  - **Kriptografi Standar Industri:** Hashing password menggunakan PBKDF2-SHA256 dengan 310.000 iterasi dan random salt 16-byte kriptografis.
+  - **Sesi Admin Sementara:** Disimpan di `chrome.storage.session` (otomatis terkunci setelah 5 menit tidak aktif atau saat browser ditutup).
+  - **Anti Brute-Force Rate Limiting:** Mekanisme progressive backoff otomatis jika terjadi percobaan password yang salah berulang kali.
+  - **Sanitized Backup & Restore:** Fitur ekspor/impor konfigurasi aman tanpa menyertakan hash password atau data sensitif sesi.
+- 🔏 **100% Privat & Offline:** Seluruh proses pencocokan query dan penyimpanan data dilakukan 100% lokal di browser pengguna tanpa mengirim data apa pun ke server eksternal.
+
+---
+
+## 📁 Struktur Direktori
 
 ```text
 search-keyword-blocker/
-├── manifest.json                  # Konfigurasi Manifest V3
-├── package.json                   # Metadata & script test
-├── README.md                      # Dokumentasi teknis & panduan instalasi
+├── manifest.json              # Konfigurasi Manifest V3
+├── package.json               # Konfigurasi proyek & scripts
+├── README.md                  # Dokumentasi proyek
+├── .gitignore                 # Filter file repository
 │
 ├── background/
-│   └── service-worker.js         # Service worker webNavigation & redirection engine
+│   └── service-worker.js     # Background listener & navigation redirect engine
 │
 ├── content/
-│   ├── search-filter.js          # Content script anti-flash & DOM monitor
-│   └── anti-flash.css            # Concealment stylesheet saat evaluasi query
+│   ├── search-filter.js      # Content script anti-flash & live DOM filter
+│   └── anti-flash.css        # Concealment stylesheet saat inisialisasi query
 │
 ├── core/
-│   ├── normalizer.js             # Normalisasi URL decoding, lowercase, unicode & space
-│   ├── keyword-matcher.js        # Algoritma pencocokan (contains, exact, word_boundary)
-│   ├── search-engine-parser.js   # Ekstraksi query multi-engine & loop protection
-│   └── auth.js                   # Web Crypto PBKDF2, salt, secure compare & rate-limiting
+│   ├── normalizer.js          # Canonical string normalization (case, space, diacritics)
+│   ├── keyword-matcher.js     # Algoritma pencocokan (contains, exact, word_boundary)
+│   ├── search-engine-parser.js# Ekstraksi parameter query multi-engine
+│   └── auth.js                # Web Crypto PBKDF2, salt, secure compare & rate-limiting
 │
 ├── storage/
-│   └── storage.js                # Wrapper chrome.storage.local & chrome.storage.session
+│   └── storage.js             # Abstraksi chrome.storage.local & session
 │
 ├── pages/
-│   ├── blocked.html              # Halaman redirect internal (blank / notice)
-│   ├── blocked.css               # Styling halaman blocked
-│   └── blocked.js                # Logika pemilihan tampilan blank vs blocked
+│   ├── blocked.html           # Halaman pengalihan internal (blank / notice)
+│   ├── blocked.css            # Styling visual modern halaman blocked
+│   └── blocked.js             # Logika render tampilan blocked
 │
 ├── popup/
-│   ├── popup.html                # Popup status, counter, & quick admin link
-│   ├── popup.css                 # Desain glassmorphic modern
-│   └── popup.js                  # Logika status & auth modal toggle off
+│   ├── popup.html             # Popup menu ekstensi di toolbar browser
+│   ├── popup.css              # Desain antarmuka glassmorphism modern
+│   └── popup.js               # Logika status aktif, counter, & quick settings
 │
 ├── options/
-│   ├── options.html              # Dashboard lengkap administrator
-│   ├── options.css               # Styling dashboard responsif
-│   └── options.js                # Keyword CRUD, bulk import, export & reset
+│   ├── options.html           # Dashboard lengkap pengaturan administrator
+│   ├── options.css            # Styling responsif dashboard options
+│   └── options.js             # Manajemen keyword, proteksi level, backup/restore
 │
 ├── assets/
-│   └── icons/                    # Ikon tameng resolusi tinggi (16, 32, 48, 128 px)
+│   └── icons/                 # Aset ikon beresolusi tinggi (16, 32, 48, 128 px)
 │
 └── tests/
-    ├── normalizer.test.js        # Pengujian canonical normalization
-    ├── keyword-matcher.test.js   # Pengujian AC-01 hingga AC-05
-    ├── search-engine-parser.test.js # Pengujian AC-06 hingga AC-09
-    ├── auth.test.js              # Pengujian PBKDF2, verification, & lockout
-    └── runner.js                 # Runner pengujian otomatis
+    ├── normalizer.test.js     # Unit test normalisasi teks & query
+    ├── keyword-matcher.test.js# Unit test logika pencocokan keyword
+    ├── search-engine-parser.test.js # Unit test parser URL search engine
+    ├── auth.test.js           # Unit test kriptografi & brute-force protection
+    └── runner.js              # Runner pengujian otomatis
 ```
 
 ---
 
-## Cara Instalasi di Browser Chromium (Chrome / Brave / Edge)
+## 🚀 Panduan Instalasi (Developer Mode)
 
-### 1. Buka Menu Ekstensi
-1. Buka Google Chrome, Brave Browser, atau Microsoft Edge.
-2. Pada address bar, buka:
-   ```text
-   chrome://extensions
+Untuk mencoba atau mengembangkan ekstensi ini secara lokal:
+
+1. **Clone repository ini:**
+   ```bash
+   git clone https://github.com/haqqirahman/search-keyword-blocker.git
+   cd search-keyword-blocker
    ```
-   *(atau `brave://extensions` jika menggunakan Brave).*
 
-### 2. Aktifkan Developer Mode
-Aktifkan toggle **Developer mode** di sudut kanan atas halaman ekstensi.
+2. **Buka halaman ekstensi di browser:**
+   - **Google Chrome:** Buka `chrome://extensions/`
+   - **Brave Browser:** Buka `brave://extensions/`
+   - **Microsoft Edge:** Buka `edge://extensions/`
 
-### 3. Muat Ekstensi (*Load unpacked*)
-1. Klik tombol **Load unpacked** (Muat yang belum dibongkar) di pojok kiri atas.
-2. Masukkan path folder ekstensi:
-   - **Dari Windows:**
-     ```text
-     C:\Users\Rahman\.gemini\antigravity-ide\scratch\search-keyword-blocker
-     ```
-   - **Atau melalui path WSL UNC:**
-     ```text
-     \\wsl.localhost\Ubuntu-24.04\home\rahman\search-keyword-blocker
-     ```
-3. Klik **Select Folder**.
-4. Ekstensi **Chromium Search Keyword Blocker** akan langsung aktif di browser!
+3. **Aktifkan Developer Mode:**
+   - Nyalakan saklar **Developer mode** di sudut kanan atas halaman.
+
+4. **Muat Ekstensi (*Load unpacked*):**
+   - Klik tombol **Load unpacked** di pojok kiri atas.
+   - Pilih folder direktori proyek `search-keyword-blocker`.
+   - Ekstensi akan langsung terpasang dan siap digunakan!
 
 ---
 
-## Menjalankan Pengujian Otomatis
+## 🧪 Menjalankan Pengujian Otomatis (*Unit Tests*)
 
-Ekstensi dilengkapi dengan unit test suite komprehensif yang menguji seluruh modul core dan kriteria penerimaan (Acceptance Criteria AC-01 s/d AC-16).
+Ekstensi ini dilengkapi dengan serangkaian pengujian otomatis untuk memvalidasi fungsi normalisasi, parser URL pencarian, algoritma pencocokan, serta sistem otentikasi:
 
-### Menjalankan dari WSL:
 ```bash
-cd /home/rahman/search-keyword-blocker
-node.exe tests/runner.js
+npm test
 ```
-*(atau `npm test`).*
 
-### Menjalankan dari Windows PowerShell:
-```powershell
-cd C:\Users\Rahman\.gemini\antigravity-ide\scratch\search-keyword-blocker
-node tests/runner.js
-```
+Semua pengujian berjalan secara mandiri menggunakan Node.js murni tanpa dependensi eksternal yang berat.
 
 ---
 
-## Lisensi
-MIT License
+## 📦 Pembuatan Paket untuk Chrome Web Store
+
+Untuk mengemas ekstensi menjadi file `.zip` siap upload ke **Chrome Web Store Developer Dashboard**:
+
+Jalankan perintah:
+```bash
+npm run package
+```
+
+File arsip produksi akan otomatis dihasilkan di:
+```text
+dist/search-keyword-blocker-v1.1.0.zip
+```
+
+> [!NOTE]
+> File `.zip` yang dihasilkan hanya menyertakan aset produksi yang diperlukan (manifest, core, content, background, pages, popup, options, icons) dan secara otomatis mengesampingkan file pengujian, git, dan dokumen internal.
+
+---
+
+## 🔒 Kebijakan Privasi & Izin (*Permissions*)
+
+Ekstensi ini hanya meminta izin yang mutlak diperlukan untuk menjalankan fungsinya:
+
+| Izin (*Permission*) | Tujuan Penggunaan |
+|---|---|
+| `storage` | Menyimpan daftar kata kunci, preferensi tampilan, dan state konfigurasi secara lokal di perangkat Anda. |
+| `webNavigation` | Mendeteksi URL pencarian sebelum halaman selesai dirender agar pencegahan berjalan seketika (*zero-latency*). |
+| `tabs` | Mengarahkan tab aktif ke halaman peringatan (*blocked page*) ketika kata kunci terlarang terdeteksi. |
+| `host_permissions` | Dibatasi secara ketat hanya pada domain mesin pencari yang didukung (`google`, `bing`, `brave`, `duckduckgo`, `yahoo`). |
+
+**Privasi Terjamin:** Ekstensi ini **tidak pernah** mengumpulkan, merekam, atau mentransmisikan data pencarian maupun data pribadi pengguna ke server mana pun.
+
+---
+
+## 📄 Lisensi
+
+Proyek ini dilisensikan di bawah lisensi [MIT](LICENSE). Silakan gunakan, modifikasi, dan distribusikan sesuai ketentuan lisensi.
