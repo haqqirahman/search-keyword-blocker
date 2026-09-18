@@ -4,7 +4,8 @@
   "description": "Chromium Search Keyword Blocker Extension (Manifest V3)",
   "main": "background/service-worker.js",
   "scripts": {
-    "test": "node tests/runner.js"
+    "test": "node tests/runner.js",
+    "package": "powershell -Command \"New-Item -ItemType Directory -Force -Path dist | Out-Null; Compress-Archive -Path @('manifest.json','assets','background','content','core','options','pages','popup','storage') -DestinationPath ('dist/search-keyword-blocker-v' + (Get-Content package.json | ConvertFrom-Json).version + '.zip') -Force\""
   },
   "keywords": [
     "chromium",
